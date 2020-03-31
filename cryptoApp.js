@@ -36,10 +36,10 @@ const decrypt = function(num, cifrado){
         if (charIndex > 0){
             if(charIndex == alfabeto.length){
                 decifrado[i] = alfabeto.charAt(num - 1);
-            } else if (charIndex + num >= alfabeto.length){
-                decifrado[i] = alfabeto.charAt(((charIndex + num) - alfabeto.length));
+            } else if (charIndex - num >= alfabeto.length){
+                decifrado[i] = alfabeto.charAt(((charIndex - num) - alfabeto.length));
             } else {
-                decifrado[i] = alfabeto.charAt(charIndex + num);
+                decifrado[i] = alfabeto.charAt(charIndex - num);
             }
         } else {
             decifrado[i] = cifrado[i];
@@ -52,7 +52,9 @@ const sendApi = (url, data) => {
 
     fetch(url, {
         method: 'POST',
-        headers: data.getHeaders(),
+        headers: {
+            ...data.getHeaders()
+        },
         body: data
     })
     .then(res => res.text())
@@ -88,7 +90,8 @@ const cryptoApp = async () => {
     write('answer.json', JSON.stringify(answerData, undefined, 4));
 
     let formData = new FormData();
-    formData.append("answer", JSON.stringify(answerData), "answer.json");
+    // formData.append("answer", JSON.stringify(answerData), "answer.json");
+    formData.append("answer", fs.createReadStream("answer.json"));
 
     sendApi(sendUrl, formData);
 };
