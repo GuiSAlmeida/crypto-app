@@ -65,6 +65,7 @@ const sendApi = (url, data) => {
 const cryptoApp = async () => {
     let answerData = {};
 
+    //#### 1° PASSO #####
     //Faz requisição para API e cria arquivo JSON
     await loadApi(reqUrl)
         .then(data => {
@@ -76,23 +77,25 @@ const cryptoApp = async () => {
     answerData = JSON.parse(answerData);
     answerData.cifrado = answerData.cifrado.toLowerCase();
 
+    //#### 2° PASSO #####
     //Atualiza object answerData com dados decifrados
     answerData.decifrado = decrypt(answerData.numero_casas, answerData.cifrado).toLowerCase();
     
     //Atualiza arquivo com atributo decifrado do object answerData
     write('answer.json', JSON.stringify(answerData));
     
+    //#### 3° PASSO #####
     //Atualiza object answerData com atributo resumo_criptografico
     const sha1 = crypto.createHash('sha1').update(answerData.decifrado).digest('hex');
     answerData.resumo_criptografico = sha1;
     
+    //#### 4° PASSO #####
     //Atualiza arquivo com atributo resumo_criptografico do object answerData
     write('answer.json', JSON.stringify(answerData, undefined, 4));
 
+    //Envia requisição post com arquivo completo decifrado
     let formData = new FormData();
-    // formData.append("answer", JSON.stringify(answerData), "answer.json");
     formData.append("answer", fs.createReadStream("answer.json"));
-
     sendApi(sendUrl, formData);
 };
 
